@@ -539,6 +539,6 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
       )}
     </div>
   );
-
+};
 
 export default NetworkVisualizer;
