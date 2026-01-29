@@ -376,37 +376,37 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
     img.src = url;
   };
 
-  return (
+    return (
     <div ref={containerRef} className="relative w-full h-full flex flex-col overflow-hidden bg-white">
       {/* Search Bar & Legend */}
       <div className="absolute top-4 left-0 right-0 z-30 px-6 flex items-center justify-between pointer-events-none">
         <div className="flex gap-2 pointer-events-auto">
-          <div className="bg-white/95 backdrop-blur-xl px-4 py-2 rounded-full border border-slate-300 flex items-center gap-4 text-[9px] font-black tracking-widest shadow-lg">
-             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span> IN</span>
-             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span> DENSE</span>
-             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span> CONV</span>
-             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span> OUT</span>
+          <div className="bg-white/95 backdrop-blur-xl px-4 py-2 rounded-full border border-gray-300 flex items-center gap-4 text-[9px] font-black tracking-widest shadow-lg">
+             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></span> IN</span>
+             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]"></span> DENSE</span>
+             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.3)]"></span> CONV</span>
+             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]"></span> OUT</span>
           </div>
           {selectedNodeId && (
-            <div className="bg-blue-600/95 backdrop-blur-xl px-4 py-2 rounded-full border border-blue-500/50 flex items-center gap-2 text-[9px] font-black tracking-widest shadow-lg text-white animate-pulse">
-               <Zap className="w-3 h-3 text-amber-300" /> SIGNAL BURST ACTIVE
+            <div className="bg-indigo-100/95 backdrop-blur-xl px-4 py-2 rounded-full border border-indigo-300 flex items-center gap-2 text-[9px] font-black tracking-widest shadow-lg text-indigo-800 animate-pulse">
+               <Zap className="w-3 h-3 text-amber-500" /> SIGNAL BURST ACTIVE
             </div>
           )}
         </div>
 
         <div className="relative pointer-events-auto max-w-xs w-full group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+            <Search className="h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-10 py-2.5 bg-white/95 backdrop-blur-xl border border-slate-300 rounded-2xl text-[11px] text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-md font-bold uppercase tracking-widest"
+            className="block w-full pl-10 pr-10 py-2.5 bg-white/95 backdrop-blur-xl border border-gray-300 rounded-2xl text-[11px] text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-lg font-bold uppercase tracking-widest"
             placeholder="Search layers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-800 transition-colors">
+            <button onClick={() => setSearchQuery('')} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-800 transition-colors">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -415,9 +415,130 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
 
       <svg ref={svgRef} className="w-full h-full cursor-grab active:cursor-grabbing bg-white"></svg>
 
-      {/* Floating Action Buttons & Layer Panel are also updated to light/blue theme similarly */}
+      {/* Floating Action Buttons for Export */}
+      <div className="absolute bottom-6 left-6 flex flex-col gap-3 z-30">
+        <button 
+          onClick={handleExportPNG}
+          className="group flex items-center gap-3 bg-white/95 backdrop-blur-xl px-5 py-3 rounded-2xl border border-gray-300 hover:border-indigo-400 hover:bg-gray-100 transition-all shadow-lg"
+          title="Export as PNG"
+        >
+          <ImageIcon className="w-4 h-4 text-gray-500 group-hover:text-indigo-500 transition-colors" />
+          <span className="text-[10px] font-black text-gray-600 group-hover:text-gray-800 uppercase tracking-widest">Snapshot PNG</span>
+        </button>
+        <button 
+          onClick={handleExportSVG}
+          className="group flex items-center gap-3 bg-white/95 backdrop-blur-xl px-5 py-3 rounded-2xl border border-gray-300 hover:border-indigo-400 hover:bg-gray-100 transition-all shadow-lg"
+          title="Export as SVG"
+        >
+          <FileCode className="w-4 h-4 text-gray-500 group-hover:text-indigo-500 transition-colors" />
+          <span className="text-[10px] font-black text-gray-600 group-hover:text-gray-800 uppercase tracking-widest">Vector SVG</span>
+        </button>
+      </div>
+
+      {/* Fixed Layer Inspector Panel */}
+      {activeLayer && (
+        <div className="absolute right-4 bottom-4 top-4 z-40 w-[360px] pointer-events-none flex flex-col justify-center animate-in fade-in slide-in-from-right-8 duration-500">
+          <div className={`bg-white/98 backdrop-blur-3xl p-7 rounded-[2.5rem] border border-gray-300 shadow-lg pointer-events-auto transition-all duration-500 flex flex-col max-h-[90%] ${pinnedLayer ? 'ring-2 ring-indigo-300' : ''}`}>
+            {pinnedLayer && (
+              <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
+                <div className="flex items-center gap-2 text-[9px] font-black text-indigo-500 uppercase tracking-[0.25em]">
+                  <Target className="w-3.5 h-3.5" /> Diagnostic Lock
+                </div>
+                <button 
+                  onClick={() => { setPinnedLayer(null); setSelectedNodeId(null); }}
+                  className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-800 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            
+            <div className="flex items-start justify-between mb-8">
+              <div className="min-w-0">
+                <h3 className="text-2xl font-black text-gray-900 leading-tight truncate tracking-tight">{activeLayer.name}</h3>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className={`text-[10px] font-black uppercase tracking-[0.1em] px-2 py-0.5 rounded-md ${
+                    activeLayer.type === 'input' ? 'bg-emerald-100 text-emerald-600' :
+                    activeLayer.type === 'output' ? 'bg-amber-100 text-amber-600' :
+                    'bg-indigo-100 text-indigo-600'
+                  }`}>
+                    {activeLayer.type}
+                  </span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em]">Classified</span>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-100 rounded-2xl border border-gray-200 flex-none ml-4 shadow-lg">
+                <Zap className="w-6 h-6 text-amber-500" />
+              </div>
+            </div>
+
+            <div className="space-y-7 flex-1 overflow-y-auto pr-3 custom-scrollbar">
+              <div>
+                <label className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] block mb-3 opacity-80">Architectural Context</label>
+                <div className="bg-gray-50 p-5 rounded-[1.5rem] border border-gray-200 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.3)]"></div>
+                  <p className="text-[13px] text-gray-700 leading-relaxed font-medium italic">
+                    "{activeLayer.contribution}"
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-100 p-5 rounded-2xl border border-gray-200 group hover:border-indigo-300 transition-all duration-300">
+                   <div className="flex items-center gap-1.5 text-[9px] text-gray-500 font-black uppercase tracking-[0.1em] mb-2">
+                    <Activity className="w-4 h-4 text-emerald-500" /> Dimension
+                   </div>
+                   <p className="text-xl font-mono font-bold text-gray-900 tracking-tighter">{activeLayer.neurons.toLocaleString()}</p>
+                </div>
+                <div className="bg-gray-100 p-5 rounded-2xl border border-gray-200 group hover:border-indigo-300 transition-all duration-300">
+                   <div className="flex items-center gap-1.5 text-[9px] text-gray-500 font-black uppercase tracking-[0.1em] mb-2">
+                    <Info className="w-4 h-4 text-blue-500" /> Function
+                   </div>
+                   <p className="text-sm font-mono font-bold text-gray-700 truncate uppercase">{activeLayer.activation || 'Linear'}</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-6 rounded-[1.5rem] border border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.1em]">Network Impact Score</span>
+                  <span className="text-xs font-mono font-bold text-indigo-500">{Math.round(activeLayer.relativeImportance * 100)}%</span>
+                </div>
+                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden p-0.5 border border-gray-300">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                    style={{ width: `${activeLayer.relativeImportance * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {activeLayer.details && (
+                <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+                  <label className="text-[9px] text-gray-500 font-black uppercase tracking-[0.1em] block mb-2">Technical Metadata</label>
+                  <p className="text-[11px] text-gray-700 leading-relaxed font-medium">
+                    {activeLayer.details}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {pinnedLayer ? (
+              <button 
+                onClick={() => { setPinnedLayer(null); setSelectedNodeId(null); }}
+                className="w-full mt-8 py-4 bg-indigo-500 hover:bg-indigo-400 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.25em] transition-all border border-indigo-400 shadow-lg active:scale-[0.98]"
+              >
+                Release Focus
+              </button>
+            ) : (
+              <div className="mt-8 text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest animate-pulse border-t border-gray-200 pt-4">
+                Select neural unit to pin
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+
 
 export default NetworkVisualizer;
