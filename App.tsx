@@ -65,7 +65,7 @@ const App: React.FC = () => {
       default:
         return (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full overflow-hidden">
-            
+
             {/* Left Sidebar */}
             <div className="lg:col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
               <div className="flex-none bg-white p-5 rounded-2xl border border-gray-300 shadow-md overflow-hidden relative">
@@ -86,7 +86,7 @@ const App: React.FC = () => {
                 </label>
 
                 {file && (
-                  <div className="mt-4 p-3 bg-gray-100 rounded-xl border border-gray-300 animate-in fade-in slide-in-from-top-2">
+                  <div className="mt-4 p-3 bg-gray-100 rounded-xl border border-gray-300 shadow-sm animate-in fade-in slide-in-from-top-2">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-blue-100 rounded-lg">
                         <FileCode className="w-4 h-4 text-blue-500" />
@@ -100,9 +100,21 @@ const App: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 space-y-3">
                 {architecture ? (
-                  <ModelInfo architecture={architecture} />
+                  <div className="flex flex-col gap-3">
+                    {architecture.layers.map((layer, index) => (
+                      <div key={index} className="bg-white border border-gray-300 shadow hover:shadow-lg rounded-xl p-3 transition-all flex flex-col gap-1">
+                        <div className="flex justify-between items-center">
+                          <p className="text-[11px] font-bold text-black truncate">{layer.name}</p>
+                          <p className="text-[9px] text-gray-500">{layer.type}</p>
+                        </div>
+                        {layer.description && (
+                          <p className="text-[9px] text-gray-600 font-mono">{layer.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 ) : !loading && (
                   <div className="h-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-2xl opacity-50 py-12">
                     <Search className="w-10 h-10 mb-3 text-gray-400" />
@@ -131,7 +143,7 @@ const App: React.FC = () => {
                   </div>
                   {architecture && (
                     <div className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-600">
-                      <span className="text-black">{architecture.layers.length} Layers Detected</span>
+                      <span className="text-black">{architecture.layers.length} Layers</span>
                       <div className="h-3 w-px bg-gray-300"></div>
                       <span>{architecture.type}</span>
                     </div>
