@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Upload, FileCode, Layers, Search, AlertCircle, Loader2, Grid, BookOpen, Activity, LayoutDashboard, Microscope } from 'lucide-react';
 import NetworkVisualizer from './components/NetworkVisualizer';
 import ModelInfo from './components/ModelInfo';
-import Dashboard from './components/Dashboard';
-import Documentation from './components/Documentation';
+
 import DiagnosticLab from './components/DiagnosticLab';
 import { analyzeModelFile } from './services/geminiService';
 import { ModelArchitecture, FileMetadata } from './types';
