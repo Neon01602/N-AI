@@ -198,8 +198,8 @@ const App: React.FC = () => {
               <Layers className="w-5 h-5 text-white" />
             </div>
             <div onClick={() => setCurrentPage('workspace')} className="cursor-pointer">
-              <h1 className="text-lg font-bold text-black leading-none">NeuralInsight <span className="text-blue-600">AI</span></h1>
-              <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Model Deconstruction v3.1</p>
+              <h1 className="text-lg font-bold text-black leading-none">Neural <span className="text-blue-600">AI</span></h1>
+              <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Model Deconstruction v1.0</p>
             </div>
           </div>
           
