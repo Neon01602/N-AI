@@ -208,15 +208,11 @@ const App: React.FC = () => {
               <button onClick={() => setCurrentPage('workspace')} className={`flex items-center gap-2 transition-colors ${currentPage === 'workspace' ? 'text-blue-600' : 'hover:text-black'}`}>
                 <Activity className="w-3.5 h-3.5" /> Workspace
               </button>
-              <button onClick={() => setCurrentPage('library')} className={`flex items-center gap-2 transition-colors ${currentPage === 'library' ? 'text-blue-600' : 'hover:text-black'}`}>
-                <LayoutDashboard className="w-3.5 h-3.5" /> Library
-              </button>
+              
               <button onClick={() => setCurrentPage('lab')} className={`flex items-center gap-2 transition-colors ${currentPage === 'lab' ? 'text-blue-600' : 'hover:text-black'}`}>
                 <Microscope className="w-3.5 h-3.5" /> Diagnostic Lab
               </button>
-              <button onClick={() => setCurrentPage('docs')} className={`flex items-center gap-2 transition-colors ${currentPage === 'docs' ? 'text-blue-600' : 'hover:text-black'}`}>
-                <BookOpen className="w-3.5 h-3.5" /> Documentation
-              </button>
+              
             </nav>
             <div className="h-6 w-px bg-gray-300"></div>
             <button className="bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded-lg text-xs transition-all border border-gray-300 font-medium">
