@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ModelArchitecture } from '../types';
 import {
   Microscope,
@@ -7,6 +7,9 @@ import {
   Info,
   AlertTriangle,
   CheckCircle2,
+  Rocket,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 
 interface Props {
@@ -14,6 +17,37 @@ interface Props {
 }
 
 const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const runGeminiAnalysis = async () => {
+    if (!architecture) return;
+
+    setLoadingAI(true);
+    setAiError(null);
+
+    try {
+      // 👉 Replace with your backend endpoint that calls Gemini
+      const res = await fetch('/api/gemini-diagnostics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ architecture }),
+      });
+
+      if (!res.ok) throw new Error('Gemini request failed');
+
+      const data = await res.json();
+
+      // Expecting: { recommendations: string[] }
+      setAiRecommendations(data.recommendations || []);
+    } catch (err) {
+      setAiError('AI analysis unavailable');
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
   if (!architecture) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-12 bg-white rounded-3xl border border-black/10">
@@ -155,6 +189,51 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
                 High parameter density detected in later layers. Consider
                 regularization to mitigate overfitting.
               </p>
+            </div>
+          </div>
+
+          {/* GEMINI AI SECTION */}
+          <div className="bg-white rounded-3xl border border-black/10 p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-black flex items-center gap-2">
+                <Rocket className="w-5 h-5 text-blue-600" />
+                Gemini Upgrade Intelligence
+              </h3>
+
+              <button
+                onClick={runGeminiAnalysis}
+                disabled={loadingAI}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-blue-600 text-blue-600 font-bold text-xs hover:bg-blue-50 disabled:opacity-50"
+              >
+                {loadingAI ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                Analyze
+              </button>
+            </div>
+
+            {aiError && (
+              <p className="text-xs text-red-500 mb-3">{aiError}</p>
+            )}
+
+            {aiRecommendations.length === 0 && !loadingAI && (
+              <p className="text-xs text-black/60">
+                Run Gemini AI analysis to receive upgrade strategies,
+                optimization paths, and architecture evolution guidance.
+              </p>
+            )}
+
+            <div className="space-y-3">
+              {aiRecommendations.map((rec, i) => (
+                <div
+                  key={i}
+                  className="p-3 border border-black/10 rounded-xl text-xs text-black/70"
+                >
+                  {rec}
+                </div>
+              ))}
             </div>
           </div>
 
