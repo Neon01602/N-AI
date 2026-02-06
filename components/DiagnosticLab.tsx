@@ -63,7 +63,7 @@ Return 5 concise upgrade recommendations as plain text lines.
 
       text = text.replace(/```/g, "").trim();
 
-      console.log("Gemini upgrade response:", text);
+      console.log("Upgrade response:", text);
 
       const recs = text
         .split("\n")
@@ -75,8 +75,8 @@ Return 5 concise upgrade recommendations as plain text lines.
         recs.length ? recs : ["No upgrade recommendations returned."]
       );
     } catch (err) {
-      console.error("Gemini upgrade failed:", err);
-      setAiError("AI analysis unavailable");
+      console.error("Upgrade failed:", err);
+      setAiError("Analysis unavailable");
     } finally {
       setLoadingAI(false);
     }
@@ -260,7 +260,7 @@ Return 5 concise upgrade recommendations as plain text lines.
 
             {aiRecommendations.length === 0 && !loadingAI && (
               <p className="text-xs text-black/60">
-                Gemini is preparing upgrade intelligence…
+               AI is preparing upgrade intelligence…
               </p>
             )}
 
