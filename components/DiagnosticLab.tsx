@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ModelArchitecture } from '../types';
+import React, { useState, useEffect } from "react";
+import { ModelArchitecture } from "../types";
+import { GoogleGenAI } from "@google/genai";
 import {
   Microscope,
   Activity,
@@ -10,7 +11,7 @@ import {
   Rocket,
   Sparkles,
   Loader2,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Props {
   architecture: ModelArchitecture | null;
@@ -21,11 +22,13 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  // Auto-run Gemini analysis when architecture changes
+  const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+  });
+
+  // 🔥 Auto-run Gemini analysis when architecture changes
   useEffect(() => {
-    if (architecture) {
-      runGeminiAnalysis();
-    }
+    if (architecture) runGeminiAnalysis();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [architecture]);
 
@@ -34,23 +37,46 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
 
     setLoadingAI(true);
     setAiError(null);
+    setAiRecommendations([]);
 
     try {
-      // 👉 Replace with your backend endpoint that calls Gemini
-      const res = await fetch('/api/gemini-diagnostics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ architecture }),
+      const prompt = `
+Analyze this neural architecture and suggest upgrade strategies.
+
+Model: ${architecture.name}
+Type: ${architecture.type}
+Layers: ${architecture.layers.length}
+Use case: ${architecture.useCase}
+
+Return 5 concise upgrade recommendations as plain text lines.
+`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
       });
 
-      if (!res.ok) throw new Error('Gemini request failed');
+      let text =
+        response.text ||
+        response.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "";
 
-      const data = await res.json();
+      text = text.replace(/```/g, "").trim();
 
-      // Expecting: { recommendations: string[] }
-      setAiRecommendations(data.recommendations || []);
+      console.log("Gemini upgrade response:", text);
+
+      const recs = text
+        .split("\n")
+        .map((r) => r.replace(/^[-*\d.]\s*/, "").trim())
+        .filter(Boolean)
+        .slice(0, 5);
+
+      setAiRecommendations(
+        recs.length ? recs : ["No upgrade recommendations returned."]
+      );
     } catch (err) {
-      setAiError('AI analysis unavailable');
+      console.error("Gemini upgrade failed:", err);
+      setAiError("AI analysis unavailable");
     } finally {
       setLoadingAI(false);
     }
@@ -72,6 +98,7 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
 
   return (
     <div className="h-full overflow-y-auto pr-4 space-y-10">
+
       {/* HEADER */}
       <div className="flex items-end justify-between border-b border-black/10 pb-6">
         <div>
@@ -81,7 +108,9 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
           </div>
           <h1 className="text-4xl font-extrabold text-black tracking-tight">
             {architecture.name}
-            <span className="ml-3 text-lg font-mono text-black/50">/ Analytics</span>
+            <span className="ml-3 text-lg font-mono text-black/50">
+              / Analytics
+            </span>
           </h1>
         </div>
 
@@ -98,8 +127,10 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
 
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT */}
+
+        {/* LEFT PANEL */}
         <div className="lg:col-span-2 space-y-8">
+
           {/* IMPORTANCE */}
           <div className="bg-white rounded-3xl border border-black/10 p-8">
             <h3 className="text-lg font-bold text-black mb-6 flex items-center gap-3">
@@ -125,7 +156,9 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
                   <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-600 rounded-full transition-all duration-700"
-                      style={{ width: `${layer.relativeImportance * 100}%` }}
+                      style={{
+                        width: `${layer.relativeImportance * 100}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -133,15 +166,12 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
             </div>
           </div>
 
-          {/* CONTRIBUTION */}
+          {/* CONTRIBUTIONS */}
           <div className="bg-white rounded-3xl border border-black/10">
-            <div className="px-8 py-6 border-b border-black/10 flex justify-between items-center">
+            <div className="px-8 py-6 border-b border-black/10">
               <h3 className="text-lg font-bold text-black">
                 Layer Contribution Analysis
               </h3>
-              <span className="text-[10px] px-3 py-1 rounded-full border border-black/20 font-bold uppercase tracking-widest text-black/60">
-                Logic
-              </span>
             </div>
 
             <div className="p-8 space-y-4">
@@ -168,8 +198,9 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
           </div>
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT PANEL */}
         <div className="space-y-8">
+
           {/* SUMMARY */}
           <div className="bg-white rounded-3xl border border-blue-600 p-8">
             <h3 className="text-lg font-bold text-black mb-4">
@@ -177,9 +208,10 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
             </h3>
 
             <p className="text-sm text-black/70 leading-relaxed mb-6">
-              This {architecture.type} model contains{' '}
+              This {architecture.type} model contains{" "}
               <strong>{architecture.layers.length}</strong> layers optimized
-              for <strong>{architecture.useCase.toLowerCase()}</strong>.
+              for{" "}
+              <strong>{architecture.useCase.toLowerCase()}</strong>.
               Estimated parameters:
               <span className="ml-2 font-mono text-blue-600">
                 {architecture.totalParameters}
@@ -200,9 +232,7 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
             </div>
           </div>
 
-          {/* GEMINI AI SECTION */}
-          <div className="border-t border-black/10 my-2" />
-
+          {/* GEMINI AI */}
           <div className="bg-white rounded-3xl border border-black/10 p-8 sticky top-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-black flex items-center gap-2">
@@ -238,7 +268,7 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
               {aiRecommendations.map((rec, i) => (
                 <div
                   key={i}
-                  className="p-3 border border-black/10 rounded-xl text-xs text-black/70 animate-fade-in"
+                  className="p-3 border border-black/10 rounded-xl text-xs text-black/70"
                 >
                   {rec}
                 </div>
@@ -251,14 +281,15 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
             <h3 className="text-sm font-black uppercase tracking-widest text-black/60 mb-4">
               Verified Attributes
             </h3>
+
             <div className="flex flex-wrap gap-2">
               {[
-                'Optimized',
-                'Pre-Trained',
-                'Vision',
-                'Dense',
-                'Validated',
-                'Quantized',
+                "Optimized",
+                "Pre-Trained",
+                "Vision",
+                "Dense",
+                "Validated",
+                "Quantized",
               ].map((tag, i) => (
                 <span
                   key={i}
