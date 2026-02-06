@@ -237,7 +237,7 @@ Return 5 concise upgrade recommendations as plain text lines.
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-black flex items-center gap-2">
                 <Rocket className="w-5 h-5 text-blue-600" />
-                Gemini Upgrade Intelligence
+                Recommendations
               </h3>
 
               <button
