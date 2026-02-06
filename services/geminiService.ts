@@ -116,7 +116,7 @@ If file content is unknown, infer from the name.
       response?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "";
 
-    console.log("📦 RAW GEMINI RESPONSE:", rawText);
+    console.log("RAW AI RESPONSE:", rawText);
 
     /**
      * Clean markdown wrappers
@@ -127,7 +127,7 @@ If file content is unknown, infer from the name.
       .trim();
 
     if (!rawText) {
-      console.warn("⚠ Gemini returned empty response — using fallback");
+      console.warn("⚠ AI returned empty response — using fallback");
       return fallbackArchitecture(file);
     }
 
@@ -136,12 +136,12 @@ If file content is unknown, infer from the name.
      */
     const parsed = JSON.parse(rawText);
 
-    console.log("✅ Parsed Gemini architecture:", parsed);
+    console.log("✅ Parsed AI architecture:", parsed);
 
     return parsed as ModelArchitecture;
 
   } catch (err) {
-    console.error("🔥 Gemini analysis failed:", err);
+    console.error("🔥 AI analysis failed:", err);
 
     console.warn("⚠ Falling back to safe architecture");
 
