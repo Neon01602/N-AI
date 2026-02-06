@@ -9,6 +9,29 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
+/**
+ * Safe fallback architecture so UI never dies
+ */
+const fallbackArchitecture = (file: FileMetadata): ModelArchitecture => ({
+  name: file.name || "Unknown Model",
+  type: "Unknown",
+  description: "Fallback architecture — Gemini analysis unavailable.",
+  totalParameters: "N/A",
+  useCase: "Diagnostic placeholder",
+  layers: [
+    {
+      id: "fallback",
+      name: "Input Layer",
+      type: "Placeholder",
+      neurons: 0,
+      activation: "none",
+      details: "Fallback layer",
+      contribution: "Ensures UI remains operational.",
+      relativeImportance: 0.5
+    }
+  ]
+});
+
 export const analyzeModelFile = async (
   file: FileMetadata,
   fileSnippet: string
@@ -23,7 +46,7 @@ File Size: ${file.size} bytes
 File Type: ${file.type}
 Content Snippet: ${fileSnippet}
 
-Provide a detailed architecture breakdown in JSON format.
+Return ONLY valid JSON.
 
 For EACH layer include:
 - contribution
@@ -33,6 +56,8 @@ If file content is unknown, infer from the name.
 `;
 
   try {
+    console.log("🚀 Sending Gemini request…");
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
@@ -83,33 +108,43 @@ If file content is unknown, infer from the name.
       }
     });
 
-    const rawText =
-      response.text ||
-      response.candidates?.[0]?.content?.parts?.[0]?.text ||
+    /**
+     * Extract Gemini text safely
+     */
+    let rawText =
+      response?.text ||
+      response?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "";
-    
-    console.log("RAW GEMINI RESPONSE:", rawText);
-    
-    let cleaned = rawText
+
+    console.log("📦 RAW GEMINI RESPONSE:", rawText);
+
+    /**
+     * Clean markdown wrappers
+     */
+    rawText = rawText
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
-    
-    try {
-      const parsed = JSON.parse(cleaned);
-    
-      console.log("PARSED ARCHITECTURE:", parsed);
-    
-      return parsed as ModelArchitecture;
-    
-    } catch (parseErr) {
-      console.error("JSON parse failed:", cleaned);
-      throw parseErr;
+
+    if (!rawText) {
+      console.warn("⚠ Gemini returned empty response — using fallback");
+      return fallbackArchitecture(file);
     }
 
+    /**
+     * Parse JSON safely
+     */
+    const parsed = JSON.parse(rawText);
+
+    console.log("✅ Parsed Gemini architecture:", parsed);
+
+    return parsed as ModelArchitecture;
 
   } catch (err) {
-    console.error("Gemini analysis failed:", err);
-    throw new Error("AI analysis unavailable");
+    console.error("🔥 Gemini analysis failed:", err);
+
+    console.warn("⚠ Falling back to safe architecture");
+
+    return fallbackArchitecture(file);
   }
 };
