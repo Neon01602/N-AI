@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ModelArchitecture } from '../types';
 import {
   Microscope,
@@ -20,6 +20,14 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  // Auto-run Gemini analysis when architecture changes
+  useEffect(() => {
+    if (architecture) {
+      runGeminiAnalysis();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [architecture]);
 
   const runGeminiAnalysis = async () => {
     if (!architecture) return;
@@ -193,7 +201,9 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
           </div>
 
           {/* GEMINI AI SECTION */}
-          <div className="bg-white rounded-3xl border border-black/10 p-8">
+          <div className="border-t border-black/10 my-2" />
+
+          <div className="bg-white rounded-3xl border border-black/10 p-8 sticky top-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-black flex items-center gap-2">
                 <Rocket className="w-5 h-5 text-blue-600" />
@@ -210,7 +220,7 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
                 ) : (
                   <Sparkles className="w-4 h-4" />
                 )}
-                Analyze
+                Re-analyze
               </button>
             </div>
 
@@ -220,16 +230,15 @@ const DiagnosticLab: React.FC<Props> = ({ architecture }) => {
 
             {aiRecommendations.length === 0 && !loadingAI && (
               <p className="text-xs text-black/60">
-                Run Gemini AI analysis to receive upgrade strategies,
-                optimization paths, and architecture evolution guidance.
+                Gemini is preparing upgrade intelligence…
               </p>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
               {aiRecommendations.map((rec, i) => (
                 <div
                   key={i}
-                  className="p-3 border border-black/10 rounded-xl text-xs text-black/70"
+                  className="p-3 border border-black/10 rounded-xl text-xs text-black/70 animate-fade-in"
                 >
                   {rec}
                 </div>
