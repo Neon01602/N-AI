@@ -86,9 +86,27 @@ If file content is unknown, infer from the name.
     const rawText =
       response.text ||
       response.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "{}";
+      "";
+    
+    console.log("RAW GEMINI RESPONSE:", rawText);
+    
+    let cleaned = rawText
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+    
+    try {
+      const parsed = JSON.parse(cleaned);
+    
+      console.log("PARSED ARCHITECTURE:", parsed);
+    
+      return parsed as ModelArchitecture;
+    
+    } catch (parseErr) {
+      console.error("JSON parse failed:", cleaned);
+      throw parseErr;
+    }
 
-    return JSON.parse(rawText) as ModelArchitecture;
 
   } catch (err) {
     console.error("Gemini analysis failed:", err);
