@@ -9,6 +9,7 @@ interface Props {
 
 interface VisualNode {
   id: string;
+  color: string;
   layerIdx: number;
   neuronIdx: number;
   x: number;
@@ -24,6 +25,20 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
   const [pinnedLayer, setPinnedLayer] = useState<ModelLayer | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const layerColorScale = d3.scaleOrdinal<string>()
+  .range([
+    "#22c55e", // green
+    "#3b82f6", // blue
+    "#a855f7", // purple
+    "#f59e0b", // amber
+    "#ef4444", // red
+    "#06b6d4", // cyan
+    "#e11d48", // rose
+    "#84cc16", // lime
+    "#6366f1", // indigo
+    "#14b8a6"  // teal
+  ]);
+
 
   useEffect(() => {
     if (!svgRef.current || !architecture) return;
@@ -89,6 +104,8 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
       const displayNeurons = Math.min(layer.neurons, maxVisibleNeurons);
       const startY = height / 2 - ((displayNeurons - 1) * 35) / 2;
       
+      const layerColor = layerColorScale(String(layerIdx));
+
       const layerNodes: VisualNode[] = Array.from({ length: displayNeurons }).map((_, i) => ({
         id: `l${layerIdx}-n${i}`,
         layerIdx,
@@ -96,8 +113,10 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
         x: xScale(layerIdx),
         y: startY + (i * 35),
         layerData: layer,
-        importance: layer.relativeImportance || 0.5
+        importance: layer.relativeImportance || 0.5,
+        color: layerColor
       }));
+
 
       nodes.push(...layerNodes);
 
@@ -264,10 +283,15 @@ const NetworkVisualizer: React.FC<Props> = ({ architecture }) => {
 
     nodeGroups.append('circle')
       .attr('r', (d: VisualNode) => (d.id === selectedNodeId ? 10 : 4 + d.importance * 4))
-      .attr('fill', (d: VisualNode) => getNodeColor(d.layerData.type))
+      .attr('fill', (d: VisualNode) => d.color)
       .attr('stroke', (d: VisualNode) => (d.id === selectedNodeId ? '#2563eb' : '#cbd5e1'))
       .attr('stroke-width', (d: VisualNode) => (d.id === selectedNodeId ? 3 : 2))
-      .attr('filter', (d: VisualNode) => (d.id === selectedNodeId) ? 'drop-shadow(0 0 20px rgba(59,130,246,0.8))' : 'none');
+      .attr('filter', (d: VisualNode) =>
+        d.id === selectedNodeId
+          ? `drop-shadow(0 0 15px ${d.color})`
+          : 'none'
+      );
+
 
     // Labels
     layers.forEach((layer, i) => {
